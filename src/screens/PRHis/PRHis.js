@@ -22,8 +22,8 @@ const PRHis= ({navigation,route}) => {
     const [user,setUser]=useState(route.params.user);
     const [loading,setLoading]=useState(true);
     const [modalVisible, setModalVisible] = useState(false);
-    const [number,setNumber] = useState();
-    const [reps,setReps]=useState();
+    const [number,setNumber] = useState("");
+    const [reps,setReps]=useState("");
     const [data,setData]=useState({})
     const [rep,setRep]=useState();
     const per=[105,100,95,90,85,80,75,70,65,60,55,50,45,40,35,30]
@@ -33,9 +33,9 @@ const PRHis= ({navigation,route}) => {
             setUser(user);
         }).then(()=>{
             getPR(user.uid,(data)=>{
-                setData(typeof data[title]=="undefined"?{}:data[title]);
-                setRep(typeof data[title]=="undefined"?null:data[title][String((Object.keys(data[title]))[0])])
-                console.log(data[title],"apple");
+                // console.log(data,"vhgvhg");
+                setData(typeof data=="undefined" || typeof data[title]=="undefined" ?{}:data[title]);
+                setRep(typeof data=="undefined"|| typeof data[title]=="undefined" ?null:data[title][String((Object.keys(data[title]))[0])])
                 setLoading(false);
             })
         })
@@ -66,7 +66,7 @@ const PRHis= ({navigation,route}) => {
                             value={number}
                             onChangeText={(number)=>{setNumber(number)}}
                             theme={{colors: {text: 'black', primary: '#6E1D1D'}}}
-                            label="Number"
+                            label="KGs"
                         />
                         <TextInput
                             mode="outlined"
@@ -80,15 +80,20 @@ const PRHis= ({navigation,route}) => {
                     <Pressable
                         style={[styles.button, styles.buttonClose]}
                             onPress={() =>{
-                                setLoading(true);
-                                savePR(user.uid,number,reps,title).then(()=>{
-                                    setLoading(false);
+                                if(number=="" || reps=="" ){
                                     setModalVisible(!modalVisible);
-                                })
+                                }
+                                else{
+                                    setLoading(true);
+                                    savePR(user.uid,number,reps,title).then(()=>{
+                                        setLoading(false);
+                                        setModalVisible(!modalVisible);
+                                    })
+                                }
                                 
                             }}
                         >
-                        <Text style={styles.textStyle}>SAVE</Text>
+                        <Text style={styles.textStyle}>{number=="" || reps=="" ?"CLOSE":"SAVE"}</Text>
                     </Pressable>
                 </ScrollView>
                 </View>
@@ -192,20 +197,3 @@ const PRHis= ({navigation,route}) => {
 
 export default PRHis;
 
-{/* <TouchableOpacity 
-                            style={styles.classItem}
-                        >
-                            <View style={styles.classItemBodyLeft}>
-                                <View style={styles.imageBody}>
-                                    <Avatar.Image size={normalize(60)} source={require('../../../assets/USER.png')}/>
-                                </View>
-                            </View>
-                            <View style={styles.classItemBodyRight}>
-                                <Text style={styles.className}>
-                                    {"apple"}
-                                </Text>
-                                <Text style={styles.classDescription}>
-                                    {"HURRAH!"}
-                                </Text>
-                            </View>
-                        </TouchableOpacity> */}
