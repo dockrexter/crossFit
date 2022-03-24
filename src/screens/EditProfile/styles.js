@@ -6,10 +6,10 @@ const height = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingTop:getStatusBarHeight(),
-      alignItems: 'center',
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop:getStatusBarHeight(),
+    //   alignItems: 'center',
     },
     body:{
         width:width-normalize(40),

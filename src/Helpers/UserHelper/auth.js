@@ -1,6 +1,7 @@
 import { auth,dbRef } from "../../../firebase";
 import Config from '../../Constants/Config';
 import * as Google from "expo-google-app-auth";
+import * as Facebook from 'expo-facebook';
 import * as firebase from "firebase";
 import User from "../DatabaseStructure/Users";
 
@@ -23,6 +24,30 @@ const handleSignUp=async(email,password,confirmPassword)=>{
 const handleLogin= async (email,password)=>{
     await auth.signInWithEmailAndPassword(email,password);
 }
+
+const facebookLogin=async()=> {
+    
+    await Facebook.initializeAsync({
+        appId: '708487053499245',
+    });
+    const { type, token, expirationDate, permissions, declinedPermissions } =
+        await Facebook.logInWithReadPermissionsAsync({
+            permissions: ['public_profile','email'],
+        });
+    if (type === 'success') {
+        var credential = firebase.auth.FacebookAuthProvider.credential(token);
+        firebase.auth().signInWithCredential(credential).then((userCredentials)=>{
+            console.log(userCredentials);
+        })
+        .catch((error) => {
+            alert(error);
+        });
+    } 
+    else {
+        alert("cancelled")
+    }
+}
+
 
 
 const checkAuthState=async(setter)=>{
@@ -83,4 +108,4 @@ const handleGoogleSignIn=()=>{
 }
 
 
-export {handleLogin,handleSignUp,checkAuthState,handleGoogleSignIn}
+export {handleLogin,handleSignUp,checkAuthState,handleGoogleSignIn,facebookLogin}

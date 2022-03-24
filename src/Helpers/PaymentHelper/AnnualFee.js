@@ -35,8 +35,10 @@ const Plans=async(uid,Entries,Price,TotalEntries,Type,ValidFrom,ValidThru)=>{
             Price:Price,
             TotalEntries:TotalEntries,
             Type:Type,
-            ValidFrom:`${ValidFrom}`,
-            ValidThru:`${ValidThru}`,
+            // ValidFrom:`${ValidFrom}`,
+            // ValidThru:`${ValidThru}`,
+            ValidFrom:"",
+            ValidThru:"",
         }
     });
 }

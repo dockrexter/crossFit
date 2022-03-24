@@ -1,6 +1,6 @@
-import React,{useState} from 'react';
+import React,{useEffect, useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import {Text, View,TouchableOpacity,Keyboard,ScrollView,FlatList,Image} from 'react-native';
+import {Text, View,TouchableOpacity,ScrollView,Dimensions,KeyboardAvoidingView,Platform} from 'react-native';
 import { MaterialCommunityIcons,AntDesign,MaterialIcons } from '@expo/vector-icons';
 import { ActivityIndicator } from 'react-native-paper';
 import styles from './styles';
@@ -12,15 +12,37 @@ import Theme from '../../Constants/Theme';
 import { dbRef } from '../../../firebase';
 import LeaderBoard from '../LeaderBoard/LeaderBoard';
 
+const width = Dimensions.get('window').width;
 
 
 
 
 const Log=({route,navigation})=> {
     const [min,setMin]=useState("0");
-    const [sec,setSec]=useState("0");
+    // const [sec,setSec]=useState("0");
     const [scale,setScale]=useState("RX");
     const [loading,setLoading]=useState(false);
+    const [comment,setComment]=useState("");
+    useEffect(()=>{
+        var leaderboardRef = dbRef.collection("LeaderBoard").doc(String(route.params.wod.Date+` ${route.params.part}`));
+        leaderboardRef.get()
+        .then((data)=>{
+            if(typeof data.data()!=="undefined"){
+                var us=(data.data()).Users
+                const objIndex = us.findIndex((obj => obj.uid == route.params.user.uid));
+                if(typeof us[objIndex] !=="undefined" ){
+                    setScale((us[objIndex])["Scale"]);
+                    setComment((us[objIndex])["Comment"]);
+                    setMin((us[objIndex])["Record"]);
+
+                }
+                
+
+            }
+
+        })
+
+    },[])
 
     const saveLog=()=>{
         // alert("saved");
@@ -38,6 +60,7 @@ const Log=({route,navigation})=> {
                     RecordType:(route.params.wod)[`Type${route.params.part}`],
                     Record:min,
                     Scale:scale,
+                    Comment:comment,
                 }
                 const objIndex = us.findIndex((obj => obj.uid == route.params.user.uid));
                 us.some(item=>item.uid==route.params.user.uid)?us[objIndex]=newUser
@@ -64,6 +87,7 @@ const Log=({route,navigation})=> {
                             RecordType:(route.params.wod)[`Type${route.params.part}`],
                             Record:min,
                             Scale:scale,
+                            Comment:comment,
                         }]
                     })
                     .then(() => {
@@ -83,6 +107,9 @@ const Log=({route,navigation})=> {
     
     return (
         <View  style={styles.container}>
+            <KeyboardAvoidingView
+                style={{justifyContent:"center",alignItems:"center"}}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={styles.topBar}>
                 <TouchableOpacity
                     onPress={()=>{
@@ -119,28 +146,17 @@ const Log=({route,navigation})=> {
                                 </Text>
                             </View>
                     </TouchableOpacity>
-                   {console.log((route.params.wod)[`Type${route.params.part}`])}
+                    {console.log((route.params.wod)[`Type${route.params.part}`])}
                     <TextInput
                         style={styles.input}
                         keyboardType="numeric"
                         maxLength={3}
+                        value={min}
                         label={(route.params.wod)[`Type${route.params.part}`]=="TIME"?"MIN":(route.params.wod)[`Type${route.params.part}`]}
                         // secureTextEntry={showPassword}
                         theme={{colors: {text: 'black', primary: '#6E1D1D'}}}
                         onChangeText={(min)=>{setMin(min)}}
-                        />
-                    {/* <TextInput
-                        style={styles.input} 
-                        keyboardType="numeric"
-                        maxLength={2}
-                        label="SEC"
-                        // secureTextEntry={showPassword}
-                        theme={{colors: {text: 'black', primary: '#6E1D1D'}}}
-                        onChangeText={(sec)=>{setSec(sec)}}
-                        // right={<TextInput.Icon onPress={()=>setShowPassword(prev=>!prev)} name={showPassword?"eye-off":"eye"} />}
-                    /> */}
-                    {/* </View> */}
-                            
+                        />  
                 </View> 
                 <View style={styles.logView}>
                     <TouchableOpacity
@@ -167,6 +183,18 @@ const Log=({route,navigation})=> {
                             
                     </TouchableOpacity>
                 </View>
+                <View style={[styles.logView]}>
+                    <TextInput
+                        style={{width:width-normalize(50),height:normalize(100)}}
+                        mode="outlined"
+                        label="Comment"
+                        value={comment}
+                        placeholder="#Comment"
+                        multiline={true}
+                        theme={{colors: {text: 'black', primary: '#6E1D1D'}}}
+                        onChangeText={(comment)=>{setComment(comment)}}
+                    />
+                </View>
                 <View style={[styles.logView,{
                     backgroundColor:"transparent",
                     shadowColor: 'transparent',
@@ -192,6 +220,7 @@ const Log=({route,navigation})=> {
                 </View>
             </ScrollView>
         <StatusBar style="auto" />
+        </KeyboardAvoidingView>
         </View>
     );
 }

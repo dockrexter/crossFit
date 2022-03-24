@@ -8,14 +8,6 @@ import getUser from "../../Helpers/UserHelper/UserFb";
 import { normalize } from "../../Helpers/normalize";
 import Theme from "../../Constants/Theme";
 
-// const Item = ({ title }) => (
-//     <TouchableOpacity
-//         onPress={()=>navigation.navigate("PRHis")}
-//         style={styles.item}>
-//         <Text style={styles.title}>{title}</Text>
-//     </TouchableOpacity>
-// );
-
 
 const PRHis= ({navigation,route}) => {
     const [title,setTitle]=useState(route.params.title);

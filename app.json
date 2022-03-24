@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "crossFit",
-    "slug": "crossFit",
+    "name": "crossFit-Bolzano",
+    "slug": "crossFit-Bolzano",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/appstore.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/crossfitLogo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFFFFF"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -16,18 +16,44 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
+    "notification": {
+      "icon": "./assets/appstore.png",
+      "color": "#FFFFFF",
+      "iosDisplayInForeground": true
     },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.crossfit.crossFitBolzano",
+      "buildNumber": "1.0.0"
+    },
+    "plugins": [
+      [
+        "expo-document-picker",
+        {
+          "appleTeamId": "YOUR_TEAM_ID"
+        }
+      ]
+    ],
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/playstore.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions":["CAMERA","READ_EXTERNAL_STORAGE","WRITE_EXTERNAL_STORAGE","ACCESS_FINE_LOCATION"],
+      "package": "com.crossfit.crossFitBolzano",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "description": ""
-  }
+  },
+  "plugins": [
+    [
+      "expo-facebook",
+      {
+        "userTrackingPermission": false
+      }
+    ]
+  ]
 }

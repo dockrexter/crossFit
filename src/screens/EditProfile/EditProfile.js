@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import {Text, View ,Image,TouchableOpacity,ScrollView} from 'react-native';
+import {Text, View ,Image,TouchableOpacity,ScrollView,KeyboardAvoidingView,Platform} from 'react-native';
 import { MaterialCommunityIcons,Fontisto,MaterialIcons} from '@expo/vector-icons';
 import { ActivityIndicator,Avatar} from 'react-native-paper';
 import styles from './styles';
@@ -10,9 +10,10 @@ import { TextInput } from 'react-native-paper';
 import { dbRef } from '../../../firebase';
 import Theme from '../../Constants/Theme';
 import getUser from '../../Helpers/UserHelper/UserFb';
-import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
 import * as firebase from "firebase";
 import { Linking } from 'react-native';
+import { MaskedTextInput} from "react-native-mask-text";
 
 
 
@@ -28,11 +29,26 @@ const EditProfile=({navigation,route})=> {
     const [codice,setCodice] =useState(route.params.user.CodiceFiscale);
     const [uploading,setUploading]=useState(false);
     const [user,setUser]=useState();
+    const [openDate,setOpenDate]=useState(false);
+    const [expiryDate,setExpiryDate]=useState("");
 
     const pickDocument = async (docType) => {
-        const { type, uri } = await DocumentPicker.getDocumentAsync({type:"application/pdf"});
-        if (type === 'cancel') {
-            return;
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+        // const { type, uri } = await DocumentPicker.getDocumentAsync();
+        // if (type === 'cancel') {
+        //     return;
+        // }
+        let uri;
+        if (result.cancelled) {
+            setImage(result.uri);
+        }
+        else{
+            uri=result.uri
         }
         try {
             setUploading(true);
@@ -57,6 +73,7 @@ const EditProfile=({navigation,route})=> {
                     }
                     var editUser= dbRef.collection("Users");
                     editUser.doc(user.uid).update(obj).then(()=>{
+                        // setOpenDate(true)
                         alert("UpLoad SuccessFull!")
                         setUploading(false);
                     })
@@ -77,6 +94,7 @@ const EditProfile=({navigation,route})=> {
             setLastName(user.LastName);
             setProfilePicture(user.Picture);
             setCodice(user.CodiceFiscale);
+            setExpiryDate(user["ExpMadicalCertificte"]);
         })
         .then(()=>{
             setLoading(false);
@@ -92,6 +110,7 @@ const EditProfile=({navigation,route})=> {
             FirstName:firstName,
             LastName:lastName,
             CodiceFiscale:codice,
+            ExpMadicalCertificte:expiryDate?expiryDate:"",
         }).then(()=>{
             setLoading(false);
         })
@@ -109,8 +128,12 @@ const EditProfile=({navigation,route})=> {
     }
     
     return (
-        <ScrollView contentContainerStyle={styles.container} >
+        <ScrollView style={styles.container} >
+            <KeyboardAvoidingView
+                style={{justifyContent:"center",alignItems:"center"}}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <View style={styles.body}>
+            
                 <View style={styles.topBar}>
                     <TouchableOpacity
                         onPress={()=>{
@@ -180,6 +203,31 @@ const EditProfile=({navigation,route})=> {
                         theme={{colors: {text: 'black', primary: '#6E1D1D'}}}
                         label="Codice Fiscale Code"
                     />
+                    <TextInput
+                        mode="outlined"
+                        style={styles.input}
+                        value={expiryDate}
+                        onFocus={()=>{setOpenDate(true)}}
+                        onChangeText={(exp)=>{
+                            setExpiryDate(exp);
+                            console.log(expiryDate);
+                        }}
+                        theme={{colors: {text: 'black', primary: '#6E1D1D'}}}
+                        render={props=>
+                            <MaskedTextInput
+                                {...props}
+                                mask="99/99/9999"
+                                value={expiryDate}
+                                placeholder="DD/MM/YYYY"
+                                keyboardType="numeric"
+                                label="expiry date madical certificate"
+                            />
+                        }
+                        // label="expiry date madical certificate"
+                    />
+                    <Text>{"expiry date : "+expiryDate}</Text>
+            
+                    
                     {/* {!route.params.user.social?
                     <TextInput
                         mode="outlined"
@@ -192,7 +240,7 @@ const EditProfile=({navigation,route})=> {
                     />:null} */}
                     <View style={{alignItems:"center",marginTop:normalize(20)}}> 
                         <TouchableOpacity
-                            style={[styles.profileBtn,{flexDirection:"row",width:"auto",paddingHorizontal:normalize(10),height:normalize(50)}]}>
+                            style={[{flexDirection:"row",width:"auto",paddingHorizontal:normalize(10),height:normalize(50)}]}>
                                 <Text onPress={()=>{Linking.openURL(user["CodiceFiscaleDoc"])}} style={[styles.profileBtnText,{color:Theme.red,paddingRight:normalize(10)}]}>{"VIEW CODICE FISCALE |"}</Text>
                                 <Text onPress={()=>{
                                         pickDocument("CodiceFiscale");
@@ -202,13 +250,15 @@ const EditProfile=({navigation,route})=> {
                         
                         <TouchableOpacity
                             
-                            style={[styles.profileBtn,{flexDirection:"row",width:"auto",paddingHorizontal:normalize(10),height:normalize(50)}]}>
+                            style={[{flexDirection:"row",width:"auto",paddingHorizontal:normalize(10),height:normalize(50)}]}>
                                 <Text onPress={()=>{Linking.openURL(user["MadicalCertificateDoc"])}} style={[styles.profileBtnText,{color:Theme.red,paddingRight:normalize(10)}]}>{"VIEW MEDICAL CERTIFICATE |"}</Text>
                                 <Text onPress={()=>{
                                     pickDocument("MadicalCirtificate");
                                 }}  style={[styles.profileBtnText,{paddingRight:normalize(10)}]}>{"UPLOAD MEDICAL CIRTIFICATE "}</Text>
                                 <MaterialIcons name="upload-file" size={normalize(15)} color={Theme.red} />
                         </TouchableOpacity>
+                        
+                        
                     </View>
                 </View>
                 
@@ -223,7 +273,9 @@ const EditProfile=({navigation,route})=> {
                         {"SAVE"}
                     </Text>
                 </TouchableOpacity>}
+                
             </View>
+            </KeyboardAvoidingView>
         <StatusBar style="auto" />
 
         </ScrollView>

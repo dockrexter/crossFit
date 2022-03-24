@@ -7,7 +7,8 @@ import styles from './styles';
 import { normalize } from '../../Helpers/normalize';
 import Constants from '../../Constants/Constants';
 import { TextInput } from 'react-native-paper';
-import {handleSignUp,handleLogin,handleGoogleSignIn,checkAuthState} from '../../Helpers/UserHelper/auth';
+import { Linking } from 'react-native';
+import {handleSignUp,handleLogin,handleGoogleSignIn,checkAuthState,facebookLogin} from '../../Helpers/UserHelper/auth';
 
 
 const Login=({navigation})=> {
@@ -68,6 +69,9 @@ const Login=({navigation})=> {
                             onChangeText={(confirmPassword)=>{setConfirmPassword(confirmPassword)}}
                         />:null}
                 </View>
+                <Text style={styles.tagline}>
+                        {"By :"}
+                </Text>
                 {loading?
                     <ActivityIndicator animating={true} size={"large"} color={"#6E1D1D"} />:
                     <TouchableOpacity 
@@ -102,6 +106,8 @@ const Login=({navigation})=> {
                         </Text>
                     </TouchableOpacity>
                 }
+                
+                
                 <View style={styles.socialLogins}>
                     
                     <TouchableOpacity 
@@ -114,11 +120,31 @@ const Login=({navigation})=> {
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={()=>{
-                            navigation.navigate("Home");
+                            facebookLogin();
                         }}
                         style={styles.facebookLoginBtn}>
                             <MaterialCommunityIcons  name="facebook" size={normalize(28)} color="white" />
                     </TouchableOpacity>
+                </View>
+                <View style={styles.signUpView}>
+                    <Text style={styles.tagline}>
+                        {"Agrees to all "}
+                    </Text>
+                    <Text 
+                    onPress={()=>{
+                        let url = "https://crossfitbolzano.com/dichiarazione-liberatoria-modulo-di-adesione/"
+                        Linking.openURL(url)
+                            .then(data => {
+                            // console.log("WhatsApp Opened successfully " + data);  //<---Success
+                            })
+                            .catch(() => {
+                            alert("Make sure you have network connection");  //<---Error
+                            });
+
+                    }}
+                    style={[styles.signUpBtn,{textDecorationLine:"underline"}]}>
+                        {"terms and conditions"}
+                    </Text>
                 </View>
             
                 <View style={styles.signUpView}>

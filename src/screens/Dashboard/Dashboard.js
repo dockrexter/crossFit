@@ -231,7 +231,17 @@ const Dashboard=({route,navigation})=> {
                     </Text>
                 </View>
                 <FlatList
-                    data={timeTable?timeTable.classes:[]}
+                    data={timeTable?(timeTable.classes).sort((obj1,obj2)=>{
+                        if (parseInt(obj1.time.substr(0, (obj1.time).indexOf(':'))) > parseInt(obj2.time.substr(0, (obj2.time).indexOf(':')))) {
+                            return 1;
+                        }
+
+                        if (parseInt(obj1.time.substr(0, (obj1.time).indexOf(':'))) < parseInt(obj2.time.substr(0, (obj2.time).indexOf(':')))) {
+                            return -1;
+                        }
+
+                        return 0;
+                    }):[]}
                     renderItem={({item,index}) =>{
                         let inusers=bookings.filter(obj=>{return obj.ClassTime==item.time})[0];
                         var cap=0;
@@ -270,8 +280,23 @@ const Dashboard=({route,navigation})=> {
                             );
                     } }
                 />
+                <View style={styles.texts}>
+                    <Text style={styles.progressText}>
+                        OpenBox
+                    </Text>
+                </View>
                 <FlatList
-                    data={timeTable?timeTable.OpenBox:[]}
+                    data={timeTable?(timeTable.OpenBox).sort((obj1,obj2)=>{
+                        if (parseInt(obj1.time.substr(0, (obj1.time).indexOf(':'))) > parseInt(obj2.time.substr(0, (obj2.time).indexOf(':')))) {
+                            return 1;
+                        }
+
+                        if (parseInt(obj1.time.substr(0, (obj1.time).indexOf(':'))) < parseInt(obj2.time.substr(0, (obj2.time).indexOf(':')))) {
+                            return -1;
+                        }
+
+                        return 0;
+                    }):[]}
                     renderItem={({item,index}) =>{
                         let inusers=bookings.filter(obj=>{return obj.ClassTime==item.time})[0];
                         var cap=0;
